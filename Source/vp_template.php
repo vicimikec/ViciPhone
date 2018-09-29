@@ -2,22 +2,22 @@
 <!--
 *******************************************************************************
 *
-*    HTML File for the Vicidial WebRTC Phone
+*	HTML File for the Vicidial WebRTC Phone
 *
-*    Copyright (C) 2016  Michael Cargile
+*	Copyright (C) 2016  Michael Cargile
 *
-*    This program is free software: you can redistribute it and/or modify
-*    it under the terms of the GNU Affero General Public License as
-*    published by the Free Software Foundation, either version 3 of the
-*    License, or (at your option) any later version.
+*	This program is free software: you can redistribute it and/or modify
+*	it under the terms of the GNU Affero General Public License as
+*	published by the Free Software Foundation, either version 3 of the
+*	License, or (at your option) any later version.
 *
-*    This program is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU Affero General Public License for more details.
+*	This program is distributed in the hope that it will be useful,
+*	but WITHOUT ANY WARRANTY; without even the implied warranty of
+*	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*	GNU Affero General Public License for more details.
 *
-*    You should have received a copy of the GNU Affero General Public License
-*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*	You should have received a copy of the GNU Affero General Public License
+*	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *******************************************************************************
 -->
@@ -25,9 +25,9 @@
 	<head>
 		<title>Vicidial Web Phone</title>
 		<link rel="stylesheet" href="<?php echo $layout; ?>" />
-		<meta http-equiv=”Pragma” content=”no-cache”>
-		<meta http-equiv=”Expires” content=”-1″>
-		<meta http-equiv=”CACHE-CONTROL” content=”NO-CACHE”>
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Expires" content="-1″>
+		<meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
 	</head>
 	<body>
 		<!-- Container -->
@@ -36,7 +36,7 @@
 			<!-- Main -->
 			<div id="main">
 				<!-- Video element to handle audio -->
-				<audio autoplay width='0' hieght='0' id="audio"></audio>
+				<audio autoplay width='0' height='0' id="audio"></audio>
 			
 				<!-- Logo -->
 				<section id="logo">
@@ -47,12 +47,12 @@
 				<!-- Controls -->
 				<section id="controls">
 					<section id="registration_control">
-						<input type="text" value="Unregistered" id="reg_status" readonly>
+						<input type="text" value="" id="reg_status" readonly>
 						<button class="button" id="register"><img id="reg_icon" src="images/wp_register_inactive.gif" alt="register"></button>
 						<button class="button" id="unregister"><img id="unreg_icon" src="images/wp_unregister_inactive.gif" alt="register"></button>
 					</section>
 					<section id="dial_control">
-						<input type="text" name="digits" value="" id="digits"/>
+						<input type="text" name="digits" value="<?php echo $dial_number?>" id="digits"/>
 						<button class="button" id="dial"><img id="dial_icon" src="images/wp_dial.gif" alt="register"></button>
 					</section>
 					<section id="audio_control">
@@ -66,28 +66,28 @@
 				<!-- Dialpad -->
 				<section id="dialpad">
 					<section id="dial_row1">
-					<button class="dialpad_button" id="one">1</button>
-					<button class="dialpad_button" id="two">2</button>
-					<button class="dialpad_button" id="three">3</button>
+						<button class="dialpad_button" id="one">1</button>
+						<button class="dialpad_button" id="two">2</button>
+						<button class="dialpad_button" id="three">3</button>
 					</section>
 					<section id="dial_row2">
-					<button class="dialpad_button" id="four">4</button>
-					<button class="dialpad_button" id="five">5</button>
-					<button class="dialpad_button" id="six">6</button>
+						<button class="dialpad_button" id="four">4</button>
+						<button class="dialpad_button" id="five">5</button>
+						<button class="dialpad_button" id="six">6</button>
 					</section>
-                                        <section id="dial_row3">
-					<button class="dialpad_button" id="seven">7</button>
-					<button class="dialpad_button" id="eight">8</button>
-					<button class="dialpad_button" id="nine">9</button>
+					<section id="dial_row3">
+						<button class="dialpad_button" id="seven">7</button>
+						<button class="dialpad_button" id="eight">8</button>
+						<button class="dialpad_button" id="nine">9</button>
 					</section>
-                                        <section id="dial_row4">
-					<button class="dialpad_button" id="star">*</button>
-					<button class="dialpad_button" id="zero">0</button>
-					<button class="dialpad_button" id="pound">#</button>
+					<section id="dial_row4">
+						<button class="dialpad_button" id="star">*</button>
+						<button class="dialpad_button" id="zero">0</button>
+						<button class="dialpad_button" id="pound">#</button>
 					</section>
 					<section id="dial_dtmf">
-					<input type="text" name="dtmf_digits" value="" id="dtmf_digits"/>
-					<button class="button" id="send_dtmf">Send</button>
+						<input type="text" name="dtmf_digits" value="" id="dtmf_digits"/>
+						<button class="button" id="send_dtmf">Send</button>
 					</section>
 				</section>
 				<!-- End Dialpad -->
@@ -99,7 +99,7 @@
 		<!-- End Container -->
 
 		<!-- Debug Output -->
-		<div id="debug"></div>
+		<pre id="debug"></pre>
 
 		<!-- variables to pass vici_phone.js -->
 		<script>
@@ -121,7 +121,11 @@
 		var hide_volume = '<?php echo $hide_volume; ?>';
 
 		// behavior options
-		var auto_answer = '<?php echo $auto_answer; ?>';;
+		var auto_answer = '<?php echo $auto_answer; ?>';
+		var auto_dial_out = '<?php echo $auto_dial_out; ?>';
+		
+		// language support
+		var language = '<?php echo $language; ?>';
 		</script>
 
 		<!-- WebRTC adapter -->
@@ -131,8 +135,11 @@
 		<!-- SIP.js library -->
 		<script src="js/sip.js"></script>
 
+		<!-- Translations file -->
+		<script src="js/translations.js"></script>
+
 		<!-- Our Java Script Code -->
 		<script src="js/vici_phone.js"></script>
-
+		
 	</body>
 </html>

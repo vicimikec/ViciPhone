@@ -1,5 +1,20 @@
 <?php
 
+// Required default values. This can be overrided by using $_GET and $_POST variables
+$language 		= 'en';
+$dial_number 	= '0000';		// The number to pre-fill in the phone
+$debug_enabled	= false;
+
+
+// Default display values
+$hide_dialpad 	= false;		// Show the dialplan
+$hide_dialbox 	= false;		// Show the dialbox
+$hide_volume 	= false;		// Display volume controls
+$hide_mute 		= false;		// Display mute button
+$auto_answer 	= false;		// Auto answer incoming calls
+$auto_dial_out 	= true;			// Auto dial out after loading (only works if a dial_number is specified)
+
+
 // Enable to enable the debug access log 
 $debug_access_log = true;
 
@@ -25,6 +40,13 @@ if (isset($_GET["server_ip"])) {
 	$server_ip=$_POST["server_ip"];
 }
 
+// the pre-filled dial number
+if (isset($_GET["dial_number"])) {
+	$dial_number=$_GET["dial_number"];
+} elseif (isset($_POST["dial_number"])) {
+	$dial_number=$_POST["dial_number"];
+}
+
 // the audio codecs to use ( currently not supported )
 if (isset($_GET["codecs"])) {
 	$codecs=$_GET["codecs"];
@@ -40,11 +62,11 @@ if (isset($_GET["options"])) {
 }
 
 // decode the GET/POST data
-$phone_login =              base64_decode($phone_login);
-$phone_pass =               base64_decode($phone_pass);
-$server_ip =                base64_decode($server_ip);
-$codecs =                   base64_decode($codecs);
-$options =                  base64_decode($options);
+$phone_login 	= base64_decode($phone_login);
+$phone_pass 	= base64_decode($phone_pass);
+$server_ip 		= base64_decode($server_ip);
+$codecs 		= base64_decode($codecs);
+$options 		= base64_decode($options);
 
 // Encryption check
 // Get remote address
@@ -82,12 +104,12 @@ if ( $debug_access_log ) {
 
 // Encryption Check
 if ( $ref_url_array['scheme'] != 'https' ) {
-        // Remote address is not https
-        // Throw and Alert and exit
-        echo "<script language='javascript'>";
-        echo "alert('Referring URL ( $base_referring_url ) is not encrypted. VICIphone cannot load without encryption. Please make sure you are using the correct URL.')";
-        echo "</script>";
-        exit;
+	// Remote address is not https
+	// Throw and Alert and exit
+	echo "<script language='javascript'>";
+	echo "alert('Referring URL ( $base_referring_url ) is not encrypted. VICIphone cannot load without encryption. Please make sure you are using the correct URL.')";
+	echo "</script>";
+	exit;
 }
 
 
@@ -105,49 +127,39 @@ $options_array = explode("--", $options);
 
 // DEBUG options
 if ( in_array( "DEBUG" , $options_array ) ) {
-        $debug_enabled = true;
-} else {
-        // default to enabled
-        $debug_enabled = false;
-}
+	$debug_enabled = true;
+} 
 
 // display restriction options
-// whether to disable the dialpad
 if ( in_array( "DIALPAD_N" , $options_array ) ) {
 	$hide_dialpad = true;
-} else {
-	// default to enabled
-	$hide_dialpad = false;
 }
+
 // whether to disable the dial box
 if ( in_array( "DIALBOX_N" , $options_array ) ) {
 	$hide_dialbox = true;
-} else {
-	// default to enabled
-	$hide_dialbox = false;
 }
+
 // whether to disable the mute button
 if ( in_array( "MUTE_N" , $options_array ) ) {
 	$hide_mute = true;
-} else {
-	// default to enabled
-	$hide_mute = false;
 }
+
 // whether to disable the volume buttons
 if ( in_array( "VOLUME_N" , $options_array ) ) {
 	$hide_volume = true;
-} else {
-	// default to enabled
-	$hide_volume = false;
 }
 
 // behavior options
 // whether to enable auto answer
 if ( in_array( "AUTOANSWER_Y" , $options_array ) ) {
 	$auto_answer = true;
-} else {
-	$auto_answer = false;
 }
+// whether to enable auto dial out
+if ( in_array( "AUTODIAL_Y" , $options_array ) ) {
+	$auto_dial_out = true;
+}
+
 
 // WEBSOCKET url
 $ws_server = '';
@@ -161,10 +173,10 @@ foreach( $options_array as $value ) {
 // Layout file handling
 $layout = '';
 foreach( $options_array as $value ) {
-        if ( strpos( $value, 'WEBPHONELAYOUT' ) !== false ) {
-                $layout = $value;
-                $layout = str_replace( 'WEBPHONELAYOUT', '', $layout );
-        }
+	if ( strpos( $value, 'WEBPHONELAYOUT' ) !== false ) {
+		$layout = $value;
+		$layout = str_replace( 'WEBPHONELAYOUT', '', $layout );
+	}
 }
 if ( $layout == '' ) {
 	# layout is blank use the default
@@ -192,4 +204,3 @@ $layout = filter_var($layout, FILTER_SANITIZE_URL );
 
 // call the template
 require_once('vp_template.php');
-?>
