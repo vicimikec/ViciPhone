@@ -24,29 +24,6 @@
 
 var debug = debug_enabled;
 
-// Default language. This can be overriden by defining the 'language' variable before loading this file
-if ( ( typeof language == 'undefined' ) || ( language.length == 0) )
-	var language = 'en';
-
-function debug_out( string ) {
-	// chekc if debug is enabled
-	if ( debug ) {
-		// format the date string
-		var date;
-		date = new Date();
-		date = date.getFullYear() + '-' +
-			('00' + (date.getMonth()+1)).slice(-2) + '-' +
-			('00' + date.getDate()).slice(-2) + ' ' +
-			('00' + date.getHours()).slice(-2) + ':' +
-			('00' + date.getMinutes()).slice(-2) + ':' +
-			('00' + date.getSeconds()).slice(-2);
-
-		// add the debug string to the debug element
-		uiElements.debug.innerHTML = uiElements.debug.innerHTML + date + ' => ' + string + '<br>';
-	}
-}
-
-
 // Array of the various UI elements
 var uiElements = {
 	container:		document.getElementById('container'),
@@ -58,10 +35,10 @@ var uiElements = {
 	reg_status:		document.getElementById('reg_status'),
 	register:		document.getElementById('register'),
 	unregister:		document.getElementById('unregister'),
-	dial_control:		document.getElementById('dial_control'),
+	dial_control:	document.getElementById('dial_control'),
 	digits:			document.getElementById('digits'),
 	dial:			document.getElementById('dial'),
-	audio_control:		document.getElementById('audio_control'),
+	audio_control:	document.getElementById('audio_control'),
 	mic_mute:		document.getElementById('mic_mute'),
 	vol_up:			document.getElementById('vol_up'),
 	vol_down:		document.getElementById('vol_down'),
@@ -79,16 +56,16 @@ var uiElements = {
 	zero:			document.getElementById('zero'),
 	pound:			document.getElementById('pound'),
 	dial_dtmf:		document.getElementById('dial_dtmf'),
-	dtmf_digits:		document.getElementById('dtmf_digits'),
+	dtmf_digits:	document.getElementById('dtmf_digits'),
 	send_dtmf:		document.getElementById('send_dtmf'),
 	debug:			document.getElementById('debug'),
 	reg_icon:		document.getElementById('reg_icon'),
 	unreg_icon:		document.getElementById('unreg_icon'),
 	dial_icon:		document.getElementById('dial_icon'),
-	hangup_icon:		document.getElementById('hangup_icon'),
+	hangup_icon:	document.getElementById('hangup_icon'),
 	mute_icon:		document.getElementById('mute_icon'),
-	vol_up_icon:		document.getElementById('vol_up_icon'),
-	vol_down_icon:		document.getElementById('vol_down_icon')
+	vol_up_icon:	document.getElementById('vol_up_icon'),
+	vol_down_icon:	document.getElementById('vol_down_icon')
 }
 
 var ua;
@@ -120,7 +97,6 @@ var ua_config = {
 // We define initial status
 uiElements.reg_status.value = get_translation('unregistered');
 
-
 debug_out ( '<br />displayName: ' + cid_name + "<br />uri: " + sip_uri + "<br />authorizationUser: " + auth_user + "<br />password: " + password + "<br />wsServers: " + ws_server );
 
 var sip_server = ua_config.uri.replace(/^.*@/,'');
@@ -132,42 +108,77 @@ ringAudio.addEventListener('ended', function() {
 	this.play();
 }, false);
 
+processDisplaySettings();
+
+if ( !SIP.WebRTC.isSupported() ) {
+	WebRTCError();
+} else {
+	initialize();
+}
+
+
+
+/************************************
+
+  Beginning of functions 
+
+*************************************/
+
+function debug_out( string ) {
+	// check if debug is enabled. If it isn't, end without doing anything
+	if ( !debug ) 
+		return false;
+	
+	// format the date string
+	var date;
+	date = new Date();
+	date = date.getFullYear() + '-' +
+		('00' + (date.getMonth()+1)).slice(-2) + '-' +
+		('00' + date.getDate()).slice(-2) + ' ' +
+		('00' + date.getHours()).slice(-2) + ':' +
+		('00' + date.getMinutes()).slice(-2) + ':' +
+		('00' + date.getSeconds()).slice(-2);
+
+	// add the debug string to the debug element
+	uiElements.debug.innerHTML = uiElements.debug.innerHTML + date + ' => ' + string + '<br>';
+}
 
 function startBlink( ) {
 	uiElements.reg_status.style.backgroundImage = "url('images/reg_status_blink.gif')";
 }
 
 function stopBlink( ) {
-		uiElements.reg_status.style.backgroundImage = "";
+	uiElements.reg_status.style.backgroundImage = "";
 }
 
-// Functions
 function dialPadPressed( digit, my_session ) {
 	// only work if the dialpad is not hidden
-	if ( !hide_dialpad ) {
-		// check if the my_session is not there
-		if ( my_session == false ) {
-			debug_out( 'Adding key press ' + digit + ' to dial digits' );
-			uiElements.digits.value = uiElements.digits.value + digit;
-		} else {
-			debug_out( 'Sending DTMF ' +  digit );
-			my_session.dtmf( digit );
-		}
+	if ( hide_dialpad )
+		return false;
+	
+	// check if the my_session is not there
+	if ( my_session == false ) {
+		debug_out( 'Adding key press ' + digit + ' to dial digits' );
+		uiElements.digits.value = uiElements.digits.value + digit;
+	} else {
+		debug_out( 'Sending DTMF ' +  digit );
+		my_session.dtmf( digit );
 	}
 }
 
 function sendButton( my_session ) {
 	// only work if the dialpad is not hidden
-	if ( !hide_dialpad ) {
-		// check if the my_session is not there
-		if ( my_session == false ) {
-			// TODO give some type of error
-		} else {
-			var digits = uiElements.dtmf_digits.value;
-			debug_out( 'Sending DTMF ' +  digits );
-			my_session.dtmf( digits );
-			uiElements.dtmf_digits.value = '';
-		}
+	if ( hide_dialpad )
+		return false;
+	
+	// check if the my_session is not there
+	if ( my_session == false ) {
+		// TODO give some type of error
+	} else {
+		var digits = uiElements.dtmf_digits.value;
+		debug_out( 'Sending DTMF ' +  digits );
+		my_session.dtmf( digits );
+		uiElements.dtmf_digits.value = '';
 	}
 }
 
@@ -186,10 +197,11 @@ function dialButton() {
 	if ( incall ) {
 		// we are so they hung up the call
 		debug_out( 'Hangup Button Pressed' );
-		uiElements.dial_icon.src = 'images/wp_dial.gif';
 		hangupCall();
+		setCallButtonStatus(false);
 	} else {
 		// we are not
+		setCallButtonStatus(true);
 		
 		// check if ringing
 		if ( ringing ) {
@@ -197,12 +209,11 @@ function dialButton() {
 			// stop the ringing
 			ringing = false;
 			stopBlink();
-					ringAudio.pause();
-					ringAudio.currentTime = 0;
+			ringAudio.pause();
+			ringAudio.currentTime = 0;
 
 			incall = true;
 			debug_out( 'Answered Call' );
-			uiElements.dial_icon.src = 'images/wp_hangup.gif';
 
 			var options = {
 				media: {
@@ -224,7 +235,6 @@ function dialButton() {
 			debug_out( 'Dial Button Pressed' );
 			// made sure the dial box is not hidden
 			if ( !hide_dialbox ) {
-				uiElements.dial_icon.src = 'images/wp_hangup.gif';
 				dialNumber();
 			}
 		}
@@ -233,131 +243,144 @@ function dialButton() {
 
 function muteButton() {
 	// only work if the button is not hidden
-	if ( !hide_mute ) {
-		// check if in a call
-		if ( incall ) {
-			if ( muted ) {
-				// call is currently muted
-				// unmute it
-				muted = false;
-				my_session.unmute();
-				debug_out( 'Un-Mute Button Pressed' );
-				uiElements.mute_icon.src = 'images/wp_mic_on.gif';
-			} else {
-				// call is not muted
-				// mute it
-				muted = true;
-				my_session.mute();
-				debug_out( 'Mute Button Pressed' );
-				uiElements.mute_icon.src = 'images/wp_mic_off.gif';
-			}
-		} else {
-			debug_out( 'Mute Button Pressed But Not In Call' );
-			uiElements.mute_icon.src = 'images/wp_mic_on.gif';
+	if ( hide_mute )
+		return false;
+
+	// check if in a call
+	if ( incall ) {
+		if ( muted ) {
+			// call is currently muted
+			// unmute it
 			muted = false;
+			my_session.unmute();
+			debug_out( 'Un-Mute Button Pressed' );
+			uiElements.mute_icon.src = 'images/wp_mic_on.gif';
+		} else {
+			// call is not muted
+			// mute it
+			muted = true;
+			my_session.mute();
+			debug_out( 'Mute Button Pressed' );
+			uiElements.mute_icon.src = 'images/wp_mic_off.gif';
 		}
+	} else {
+		debug_out( 'Mute Button Pressed But Not In Call' );
+		uiElements.mute_icon.src = 'images/wp_mic_on.gif';
+		muted = false;
 	}
 }
 
 function volumeUpButton() {
 	// only work if the volume buttons are not hidden
-	if ( !hide_volume ) {
-		debug_out( 'Volume Up Button Pressed' );
-		volume = uiElements.audio.volume;
-		debug_out( 'Current Volume = ' + Math.round(volume * 100) + '%');
-		if ( volume >= 1.0 ) {
-			debug_out( 'Volume is maxed' );
-		} else {
-			volume = volume + 0.1;
-		}
-		if ( volume < 0 ) { volume = 0; }
-		if ( volume > 1 ) { volume = 1; }
-		debug_out( 'New Volume = ' + Math.round(volume * 100) + '%' );
-		uiElements.audio.volume = volume;
+	if ( hide_volume )
+		return false;
+	
+	debug_out( 'Volume Up Button Pressed' );
+	volume = uiElements.audio.volume;
+	debug_out( 'Current Volume = ' + Math.round(volume * 100) + '%');
+	if ( volume >= 1.0 ) {
+		debug_out( 'Volume is maxed' );
+	} else {
+		volume = volume + 0.1;
 	}
+	if ( volume < 0 ) { volume = 0; }
+	if ( volume > 1 ) { volume = 1; }
+	debug_out( 'New Volume = ' + Math.round(volume * 100) + '%' );
+	uiElements.audio.volume = volume;
 }
 
 function volumeDownButton() {
 	// only work if the volume buttons are not hidden
-	if ( !hide_volume ) {
-		debug_out( 'Volume Down Button Pressed' );
-		volume = uiElements.audio.volume;
-		debug_out( 'Current Volume = ' + Math.round(volume * 100) + '%');
-		if ( volume <= 0 ) {
-				debug_out( 'Volume is already 0' );
-		} else {
-				volume = volume - 0.1;
-		}
-		if ( volume < 0 ) { volume = 0; }
-		if ( volume > 1 ) { volume = 1; }
-		debug_out( 'New Volume = ' + Math.round(volume * 100) + '%');
-		uiElements.audio.volume = volume;
+	if ( hide_volume )
+		return false;
+	
+	debug_out( 'Volume Down Button Pressed' );
+	volume = uiElements.audio.volume;
+	debug_out( 'Current Volume = ' + Math.round(volume * 100) + '%');
+	if ( volume <= 0 ) {
+		debug_out( 'Volume is already 0' );
+	} else {
+		volume = volume - 0.1;
 	}
+	if ( volume < 0 ) { volume = 0; }
+	if ( volume > 1 ) { volume = 1; }
+	debug_out( 'New Volume = ' + Math.round(volume * 100) + '%');
+	uiElements.audio.volume = volume;
 }
 
 function hangupCall() {
 	// check if in a call
-	if ( incall ) {
-		my_session.terminate();
-		my_session = false;
-		incall = false;
-		ringAudio.pause();
-		ringAudio.currentTime = 0;
-		if ( ua.isRegistered() ) {
-			uiElements.reg_status.value = get_translation('registered');
-			uiElements.reg_icon.src = 'images/wp_register_active.gif';
-			uiElements.unreg_icon.src = 'images/wp_unregister_inactive.gif';
-			uiElements.dial_icon.src = 'images/wp_dial.gif';
-		} else {
-			uiElements.reg_status.value = get_translation('unregistered');
-			uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-			uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';
-			uiElements.dial_icon.src = 'images/wp_dial.gif';
-		}				
-	} else {
+	if ( !incall ) { 
 		debug_out( 'Attempt to hang up non-existant call' );
+		return false;
 	}
+
+	my_session.terminate();
+	my_session = false;
+	incall = false;
+	ringAudio.pause();
+	ringAudio.currentTime = 0;
+	if ( ua.isRegistered() ) {
+		setRegisterStatus('registered');
+		setCallButtonStatus(false);
+	} else {
+		setRegisterStatus('unregistered');
+		setCallButtonStatus(true);
+	}				
 }
 
 function dialNumber() {
 	// check if currently in a call
 	if ( incall ) {
 		debug_out( 'Already in a call' );
-	} else {
-		var uri = uiElements.digits.value + '@' + sip_server;
-		var options = {
-			media: {
-				constraints: {
-					audio: true,
-					video: false
-				},
-				render: {
-					remote: uiElements.audio
-				},
-				stream: mediaStream
-			}
-		};
-		my_session = ua.invite( uri, options );
-		incall = true;
-		uiElements.reg_status.value = get_translation('attempting') + ' - ' + uiElements.digits.value;
+		return false;
+	} 
+	
+	var uri = uiElements.digits.value + '@' + sip_server;
+	var options = {
+		media: {
+			constraints: {
+				audio: true,
+				video: false
+			},
+			render: {
+				remote: uiElements.audio
+			},
+			stream: mediaStream
+		}
+	};
+	my_session = ua.invite( uri, options );
+	incall = true;
+	setRegisterStatus(get_translation('attempting') + ' - ' + uiElements.digits.value);
+	setCallButtonStatus(true);
 
-		caller = uiElements.digits.value;
+	caller = uiElements.digits.value;
 
-		// assign event handlers to the session
-		my_session.on('accepted', function() { handleAccepted() } );
-		my_session.on('bye', function( request ) { handleBye( request ) } );
-		my_session.on('failed', function( response, cause ) { handleFailed( response, cause ) } );
-		my_session.on('refer', function() { handleInboundRefer() } );
-		my_session.on('progress', function( progress ) { handleProgress( progress ) } );
+	// assign event handlers to the session
+	my_session.on('accepted', function() { handleAccepted() } );
+	my_session.on('bye', function( request ) { handleBye( request ) } );
+	my_session.on('failed', function( response, cause ) { handleFailed( response, cause ) } );
+	my_session.on('refer', function() { handleInboundRefer() } );
+	my_session.on('progress', function( progress ) { handleProgress( progress ) } );
 
-		uiElements.digits.value = '';
+	uiElements.digits.value = '';
+}
+
+function setCallButtonStatus( status ) {
+	if ( status ) {
+		uiElements.dial.setAttribute('class', 'button hangup');
+		uiElements.dial_icon.src = 'images/wp_hangup.gif';		
+	}
+	else {
+		uiElements.dial.setAttribute('class', 'button dial');
+		uiElements.dial_icon.src = 'images/wp_dial.gif';		
 	}
 }
 
 function handleProgress( progress ) {
 	debug_out( 'Their end is ringing - ' + progress );
 
-	uiElements.reg_status.value = get_translation('ringing') + ' - ' + caller;
+	setRegisterStatus(get_translation('ringing') + ' - ' + caller);
 
 	// start ringing
 	ringAudio.play();
@@ -401,7 +424,6 @@ function handleInvite( session ) {
 		if ( auto_answer ) {
 			incall = true;
 			debug_out( 'Auto-Answered Call' );
-			uiElements.dial_icon.src = 'images/wp_hangup.gif';
 
 			var options = {
 				media: {
@@ -416,6 +438,7 @@ function handleInvite( session ) {
 				}
 			}
 			my_session.accept(options);
+			setCallButtonStatus(true);
 		} else {
 			// auto answer not enabled 
 			// ring the phone
@@ -442,61 +465,58 @@ function handleAccepted() {
 function handleBye( request ) {
 	debug_out( 'Session Bye Event Fired |' + request  );
 	if ( ua.isRegistered() ) {
-		uiElements.reg_status.value = get_translation('registered');
-		uiElements.reg_icon.src = 'images/wp_register_active.gif';
-		uiElements.unreg_icon.src = 'images/wp_unregister_inactive.gif';
-		uiElements.dial_icon.src = 'images/wp_dial.gif';
+		setRegisterStatus( 'registered' );
 	} else {
-		uiElements.reg_status.value = get_translation('unregistered');
-		uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-		uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';
-		uiElements.dial_icon.src = 'images/wp_dial.gif';		
+		setRegisterStatus( 'unregistered' );
 	}
+	setCallButtonStatus(false);
 	my_session = false;
 	incall = false;
 }
 
 function handleFailed( response, cause ) {
 	debug_out( 'Session Failed Event Fired | ' + response + ' | ' + cause );
-	if ( cause == 'Canceled' ) {
-		// stop ringing
-		ringing = false;
-		stopBlink();
-		ringAudio.pause();
-		ringAudio.currentTime = 0;
-		// check if we are registered and adjust the display accordingly
-		if ( ua.isRegistered() ) {
-			uiElements.reg_status.value = get_translation('registered');
-			uiElements.reg_icon.src = 'images/wp_register_active.gif';
-			uiElements.unreg_icon.src = 'images/wp_unregister_inactive.gif';
-		} else {
-			uiElements.reg_status.value = get_translation('unregistered');;
-			uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-			uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';			
-		}
-		my_session = false;
-		return;
+	// stop ringing
+	ringing = false;
+	stopBlink();
+	ringAudio.pause();
+	ringAudio.currentTime = 0;
+	// check if we are registered and adjust the display accordingly
+	if ( ua.isRegistered() ) {
+		setRegisterStatus( 'registered' );
+	} else {
+		setRegisterStatus( 'unregistered' );
 	}
-	if (( cause == 'WebRTC Error' ) || ( cause == 'WebRTC not supported') || ( cause == 'WebRTC not supported' )) {
-		// stop ringing
-		ringing = false;
-		ringAudio.pause();
-		ringAudio.currentTime = 0;
-		// check if we are registered and adjust the display accordingly
-		if ( ua.isRegistered() ) {
-			uiElements.reg_status.value = get_translation('registered')
-			uiElements.reg_icon.src = 'images/wp_register_active.gif';
-			uiElements.unreg_icon.src = 'images/wp_unregister_inactive.gif';
-		} else {
-			uiElements.reg_status.value = get_translation('unregistered');
-			uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-			uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';
-		}
-		my_session = false;
+	my_session = false;
+	if ( cause == 'Canceled' ) { }
+	else if (( cause == 'WebRTC Error' ) || ( cause == 'WebRTC not supported') || ( cause == 'WebRTC not supported' )) {
 		WebRTCError();
-		return;
 	}
+	setCallButtonStatus(false);
+	my_session = false;
+	incall = false;
 	return;
+}
+
+function setRegisterStatus( message ) {
+	if ( (message == 'registered') || (message == 'connected') ) {
+		uiElements.reg_icon.src = 'images/wp_register_active.gif';
+		uiElements.unreg_icon.src = 'images/wp_unregister_inactive.gif';	
+		translated_message = get_translation(message)
+	}
+	else if ( (message == 'unregistered') || (message == 'disconnected') || (message == 'register_failed') ) {
+		uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
+		uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';
+		translated_message = get_translation(message)
+	}
+	else {
+		translated_message = message;
+	}
+	
+	if (uiElements.reg_status.type == 'text')
+		uiElements.reg_status.value = translated_message;	
+	else
+		uiElements.reg_status.innerHTML = translated_message;
 }
 
 function handleInboundRefer() {
@@ -504,12 +524,12 @@ function handleInboundRefer() {
 }
 
 function WebRTCError() {
-	alert( 'Something went wrong with WebRTC. Either your browser does not support the necessary WebRTC functions, you did not allow your browser to access the microphone, or there is a configuration issue. Please check your browsers error console for more details. For a list of compatible browsers please vist http://webrtc.org/');
+	alert( get_translation('webrtc_error'));
 }
 
 function initialize() {
-// Initialization
-// Dial pad keys 
+	// Initialization
+	// Dial pad keys 
 	uiElements.one.addEventListener("click", function() { dialPadPressed('1',my_session) } );
 	uiElements.two.addEventListener("click", function() { dialPadPressed('2',my_session) } );
 	uiElements.three.addEventListener("click", function() { dialPadPressed('3',my_session) } );
@@ -525,8 +545,6 @@ function initialize() {
 	
 	// Send DTMF button
 	uiElements.send_dtmf.addEventListener("click", function() { sendButton(my_session) } );
-	// Change text language for Send DTMF button
-	uiElements.send_dtmf.innerHTML = get_translation('send');
 	
 	// Dial Button
 	uiElements.dial.addEventListener("click", function() { dialButton() } );
@@ -544,6 +562,8 @@ function initialize() {
 	// Unregister Button
 	uiElements.unregister.addEventListener("click", function() { unregisterButton( ua ) } );
 
+	// Change text language for some elements
+	uiElements.send_dtmf.innerHTML = get_translation('send');
 	uiElements.reg_status.value = get_translation('connecting');
 
 	// create the User Agent
@@ -551,15 +571,11 @@ function initialize() {
 
 	// assign event handlers
 	ua.on('connected', function () {
-		uiElements.reg_status.value = get_translation('connected');
-		uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-		uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';
+		setRegisterStatus('connected');
 	});
 	
 	ua.on('registered', function () {
-		uiElements.reg_status.value = get_translation('registered');
-		uiElements.reg_icon.src = 'images/wp_register_active.gif';
-		uiElements.unreg_icon.src = 'images/wp_unregister_inactive.gif';
+		setRegisterStatus( 'registered' );
 		
 		// If auto dial out is enabled and a dial_number is given, do the auto dialing
 		if ( (auto_dial_out) && (uiElements.digits.value.length > 0) ) {
@@ -568,21 +584,15 @@ function initialize() {
 	});
 
 	ua.on('unregistered', function () {
-		uiElements.reg_status.value = get_translation('unregistered');;
-		uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-		uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';
+		setRegisterStatus( 'unregistered' );
 	});
 
 	ua.on('disconnected', function () {
-		uiElements.reg_status.value = get_translation('disconnected');;
-		uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-		uiElements.unreg_icon.src = 'images/wp_unregister_inactive.gif';
+		setRegisterStatus('disconnected');
 	});
 
 	ua.on('registrationFailed', function () {
-		uiElements.reg_status.value = get_translation('register_failed');
-		uiElements.reg_icon.src = 'images/wp_register_inactive.gif';
-		uiElements.unreg_icon.src = 'images/wp_unregister_active.gif';
+		setRegisterStatus('register_failed');
 	});
 
 	ua.on('invite', function (session) {
@@ -594,21 +604,22 @@ function initialize() {
 		audio: true,
 		video: false
 	};
-	function getUserMediaSuccess (stream) {
-		console.log('getUserMedia succeeded', stream)
-		mediaStream = stream;
-	}
-	function getUserMediaFailure (e) {
-		console.error('getUserMedia failed:', e);
-	}
 	SIP.WebRTC.isSupported();
 	SIP.WebRTC.getUserMedia(mediaConstraints, getUserMediaSuccess, getUserMediaFailure);
 };
 
+function getUserMediaSuccess (stream) {
+	console.log('getUserMedia succeeded', stream)
+	mediaStream = stream;
+}
+
+function getUserMediaFailure (e) {
+	console.error('getUserMedia failed:', e);
+}
+
 function processDisplaySettings() {
 	if ( hide_dialpad ) {
 		uiElements.dialpad.setAttribute("hidden", true);
-		uiElements.main.style.width = '265px';
 	}
 	if ( hide_dialbox ) {
 		uiElements.digits.setAttribute("hidden", true);
@@ -622,16 +633,15 @@ function processDisplaySettings() {
 	}
 }
 
-processDisplaySettings();
 
-if ( !SIP.WebRTC.isSupported() ) {
-	WebRTCError();
-} else {
-	initialize();
-}
-
-
+/*
+	Hardcoded messages. Can be translated by loading translations.js
+*/
 function get_translation(text) {
+	// Default language. This can be overriden by defining the 'language' variable before loading this file
+	if ( ( typeof language == 'undefined' ) || ( language.length == 0) )
+		language = 'en';
+	
 	if ( typeof vici_translations == 'undefined' ) {
 		vici_translations = {
 			en: {
@@ -645,12 +655,13 @@ function get_translation(text) {
 				ringing: 		'Ringing',
 				attempting: 	'Attempting',
 				send: 			'Send',
+				webrtc_error:	'Something went wrong with WebRTC. Either your browser does not support the necessary WebRTC functions, you did not allow your browser to access the microphone, or there is a configuration issue. Please check your browsers error console for more details. For a list of compatible browsers please vist http://webrtc.org/',
 			}
 		}
 	}
-	// If selected language doesn't exit, fallback to english
-	if ( typeof vici_translations[language] == 'undefined' ) {
+	// If selected language doesn't exist, fallback to english
+	if ( typeof vici_translations[language] == 'undefined' )
 		vici_translations[language] = vici_translations['en'];
-	}
+
 	return vici_translations[language][text];
 }
