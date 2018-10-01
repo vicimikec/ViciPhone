@@ -133,7 +133,7 @@
 		<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
 		<!-- SIP.js library -->
-		<script src="js/sip.js"></script>
+		<script src="js/sip.min.js"></script>
 
 		<!-- Translations file -->
 		<script src="js/translations.js"></script>
