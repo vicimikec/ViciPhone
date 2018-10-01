@@ -35,7 +35,7 @@ var vici_translations = {
 		ringing: 		'Ringing',
 		attempting: 	'Attempting',
 		send: 			'Send',
-		
+		webrtc_error:	'Something went wrong with WebRTC. Either your browser does not support the necessary WebRTC functions, you did not allow your browser to access the microphone, or there is a configuration issue. Please check your browsers error console for more details. For a list of compatible browsers please vist http://webrtc.org/',		
 	},
 	// Spanish - Español
 	es: {
@@ -49,6 +49,6 @@ var vici_translations = {
 		ringing: 		'Timbrando',
 		attempting: 	'Intentando',
 		send: 			'Enviar',
-		
+		webrtc_error:	'Algo salió mal con WebRTC. Ya sea que su navegador no es compatible con las funciones necesarias para WebRTC, no ha autorizado que su navegador acceda al micrófono, o existe un problema en la configuración. Por favor, revise la consola de error de su navegador para obtener más detalles. Para revisar la lista de navegadores compatibles, visite http://webrtc.org',		
 	}
 }
