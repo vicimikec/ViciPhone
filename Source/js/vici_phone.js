@@ -143,13 +143,19 @@ function debug_out( string ) {
 	uiElements.debug.innerHTML = uiElements.debug.innerHTML + date + ' => ' + string + '<br>';
 }
 
+
+
 function startBlink( ) {
 	uiElements.reg_status.style.backgroundImage = "url('images/reg_status_blink.gif')";
 }
 
+
+
 function stopBlink( ) {
 	uiElements.reg_status.style.backgroundImage = "";
 }
+
+
 
 function dialPadPressed( digit, my_session ) {
 	// only work if the dialpad is not hidden
@@ -165,6 +171,8 @@ function dialPadPressed( digit, my_session ) {
 		my_session.dtmf( digit );
 	}
 }
+
+
 
 function sendButton( my_session ) {
 	// only work if the dialpad is not hidden
@@ -182,15 +190,21 @@ function sendButton( my_session ) {
 	}
 }
 
+
+
 function registerButton( ua ) {
 	debug_out( 'Register Button Pressed' );
 	ua.register();
 }
 
+
+
 function unregisterButton( ua ) {
 	debug_out( 'Un-Register Button Pressed' );
 	ua.unregister();
 }
+
+
 
 function dialButton() {
 	// check if in a call
@@ -199,47 +213,46 @@ function dialButton() {
 		debug_out( 'Hangup Button Pressed' );
 		hangupCall();
 		setCallButtonStatus(false);
-	} else {
-		// we are not
-		setCallButtonStatus(true);
+		return false;
+	} 
+	
+	// we are not in a call
+	setCallButtonStatus(true);
 		
-		// check if ringing
-		if ( ringing ) {
-			// we are ringing
-			// stop the ringing
-			ringing = false;
-			stopBlink();
-			ringAudio.pause();
-			ringAudio.currentTime = 0;
+	// check if ringing
+	if ( ringing ) {
+		// we are ringing
+		// stop the ringing
+		setRinging(false);
 
-			incall = true;
-			debug_out( 'Answered Call' );
+		incall = true;
+		debug_out( 'Answered Call' );
 
-			var options = {
-				media: {
-					constraints: {
-						audio: true,
-						video: false
-					},
-					render: {
-						remote: uiElements.audio
-					},
-					stream: mediaStream
-				}
+		var options = {
+			media: {
+				constraints: {
+					audio: true,
+					video: false
+				},
+				render: {
+					remote: uiElements.audio
+				},
+				stream: mediaStream
 			}
+		}
+		my_session.accept(options);
 
-			my_session.accept(options);
-
-		} else {
-			// not in a call and the phone is not ringing
-			debug_out( 'Dial Button Pressed' );
-			// made sure the dial box is not hidden
-			if ( !hide_dialbox ) {
-				dialNumber();
-			}
+	} else {
+		// not in a call and the phone is not ringing
+		debug_out( 'Dial Button Pressed' );
+		// made sure the dial box is not hidden
+		if ( !hide_dialbox ) {
+			dialNumber();
 		}
 	}
 }
+
+
 
 function muteButton() {
 	// only work if the button is not hidden
@@ -270,43 +283,48 @@ function muteButton() {
 	}
 }
 
+
+
 function volumeUpButton() {
 	// only work if the volume buttons are not hidden
 	if ( hide_volume )
 		return false;
-	
+	setVolume(0.1);
 	debug_out( 'Volume Up Button Pressed' );
-	volume = uiElements.audio.volume;
-	debug_out( 'Current Volume = ' + Math.round(volume * 100) + '%');
-	if ( volume >= 1.0 ) {
-		debug_out( 'Volume is maxed' );
-	} else {
-		volume = volume + 0.1;
-	}
-	if ( volume < 0 ) { volume = 0; }
-	if ( volume > 1 ) { volume = 1; }
-	debug_out( 'New Volume = ' + Math.round(volume * 100) + '%' );
-	uiElements.audio.volume = volume;
 }
+
+
 
 function volumeDownButton() {
 	// only work if the volume buttons are not hidden
 	if ( hide_volume )
 		return false;
-	
+	setVolume(-0.1);
 	debug_out( 'Volume Down Button Pressed' );
+}
+
+
+
+function setVolume( inc ) {
 	volume = uiElements.audio.volume;
 	debug_out( 'Current Volume = ' + Math.round(volume * 100) + '%');
-	if ( volume <= 0 ) {
+	if ( (volume + inc) < 0 ) {
 		debug_out( 'Volume is already 0' );
-	} else {
-		volume = volume - 0.1;
+		return;
 	}
+	else if ( (volume + inc) > 1 ) {
+		debug_out( 'Volume is already maxed' );
+		return;
+	}
+	else
+		volume = volume + inc;
 	if ( volume < 0 ) { volume = 0; }
 	if ( volume > 1 ) { volume = 1; }
 	debug_out( 'New Volume = ' + Math.round(volume * 100) + '%');
 	uiElements.audio.volume = volume;
 }
+
+
 
 function hangupCall() {
 	// check if in a call
@@ -328,6 +346,8 @@ function hangupCall() {
 		setCallButtonStatus(true);
 	}				
 }
+
+
 
 function dialNumber() {
 	// check if currently in a call
@@ -366,6 +386,8 @@ function dialNumber() {
 	uiElements.digits.value = '';
 }
 
+
+
 function setCallButtonStatus( status ) {
 	if ( status ) {
 		uiElements.dial.setAttribute('class', 'button hangup');
@@ -377,15 +399,18 @@ function setCallButtonStatus( status ) {
 	}
 }
 
+
+
 function handleProgress( progress ) {
 	debug_out( 'Their end is ringing - ' + progress );
 
 	setRegisterStatus(get_translation('ringing') + ' - ' + caller);
 
 	// start ringing
-	ringAudio.play();
-	startBlink();
+	setRinging(true);
 }
+
+
 
 
 function handleInvite( session ) {
@@ -442,14 +467,12 @@ function handleInvite( session ) {
 		} else {
 			// auto answer not enabled 
 			// ring the phone
-			ringing = true;
-	
-			// start ringing
-			ringAudio.play();
-			startBlink();
+			setRinging(true);
 		}
 	}
 }
+
+
 
 function handleAccepted() {
 	debug_out( 'Session Accepted Event Fired' );
@@ -457,10 +480,10 @@ function handleAccepted() {
 	uiElements.reg_status.value = get_translation('incall') + ' - ' + caller;
 
 	// They answered stop ringing
-	ringAudio.pause();
-	ringAudio.currentTime = 0;
-	stopBlink();
+	setRinging(false);
 }
+
+
 
 function handleBye( request ) {
 	debug_out( 'Session Bye Event Fired |' + request  );
@@ -474,13 +497,13 @@ function handleBye( request ) {
 	incall = false;
 }
 
+
+
 function handleFailed( response, cause ) {
 	debug_out( 'Session Failed Event Fired | ' + response + ' | ' + cause );
 	// stop ringing
-	ringing = false;
-	stopBlink();
-	ringAudio.pause();
-	ringAudio.currentTime = 0;
+	setRinging(false);
+
 	// check if we are registered and adjust the display accordingly
 	if ( ua.isRegistered() ) {
 		setRegisterStatus( 'registered' );
@@ -497,6 +520,8 @@ function handleFailed( response, cause ) {
 	incall = false;
 	return;
 }
+
+
 
 function setRegisterStatus( message ) {
 	if ( (message == 'registered') || (message == 'connected') ) {
@@ -519,13 +544,19 @@ function setRegisterStatus( message ) {
 		uiElements.reg_status.innerHTML = translated_message;
 }
 
+
+
 function handleInboundRefer() {
 	debug_out( 'Session Refer Event Fired' );
 }
 
+
+
 function WebRTCError() {
 	alert( get_translation('webrtc_error'));
 }
+
+
 
 function initialize() {
 	// Initialization
@@ -608,14 +639,20 @@ function initialize() {
 	SIP.WebRTC.getUserMedia(mediaConstraints, getUserMediaSuccess, getUserMediaFailure);
 };
 
+
+
 function getUserMediaSuccess (stream) {
 	console.log('getUserMedia succeeded', stream)
 	mediaStream = stream;
 }
 
+
+
 function getUserMediaFailure (e) {
 	console.error('getUserMedia failed:', e);
 }
+
+
 
 function processDisplaySettings() {
 	if ( hide_dialpad ) {
@@ -630,6 +667,23 @@ function processDisplaySettings() {
 	if ( hide_volume ) {
 		uiElements.vol_down.setAttribute("hidden", true);
 		uiElements.vol_up.setAttribute("hidden", true);
+	}
+}
+
+
+
+
+function setRinging( ringing_status ) {
+	if ( ringing_status ) {
+		ringing = true;
+		startBlink();		
+		ringAudio.play();
+	}
+	else {
+		ringing = false;
+		stopBlink();
+		ringAudio.pause();
+		ringAudio.currentTime = 0;
 	}
 }
 
