@@ -2,7 +2,7 @@
 
 // Required default values. This can be overrided by using $_GET and $_POST variables
 $language 		= 'en';
-$dial_number 	= '0000';		// The number to pre-fill in the phone
+$dial_number 	= '';		// The number to pre-fill in the phone
 $debug_enabled	= false;
 
 
@@ -15,7 +15,7 @@ $auto_answer 	= false;		// Auto answer incoming calls
 $auto_dial_out 	= true;			// Auto dial out after loading (only works if a dial_number is specified)
 
 
-// Enable to enable the debug access log 
+// Enable to enable the debug access log
 $debug_access_log = true;
 
 // GET / POST Options
@@ -57,7 +57,7 @@ if (isset($_GET["codecs"])) {
 // additional webphone options
 if (isset($_GET["options"])) {
 	$options=$_GET["options"];
-} elseif (isset($_POST["options"])) { 
+} elseif (isset($_POST["options"])) {
 	$options=$_POST["options"];
 }
 
@@ -76,8 +76,8 @@ if (!empty($_SERVER['HTTP_REFERER'])) {
 }
 $ref_url_array = parse_url( $referring_url );
 
-// Do not include 
-// user / pass / port / get / post 
+// Do not include
+// user / pass / port / get / post
 // data in the URL that is logged or displayed
 $base_referring_url = $ref_url_array['scheme'] . "://" . $ref_url_array['host'] . $ref_url_array['path'];
 
@@ -128,7 +128,7 @@ $options_array = explode("--", $options);
 // DEBUG options
 if ( in_array( "DEBUG" , $options_array ) ) {
 	$debug_enabled = true;
-} 
+}
 
 // display restriction options
 if ( in_array( "DIALPAD_N" , $options_array ) ) {
@@ -185,7 +185,7 @@ if ( $layout == '' ) {
 	# layout begins with http:// or https:// so it is a link
 	# do nothing
 } elseif ( preg_match('#^css/#i', $layout) === 1 ) {
-	# layout begins with css/ 
+	# layout begins with css/
 	if ( preg_match('#\.css$#i', $layout) === 1 ) {
 		# layout ends in .css
 		# do nothing
