@@ -37,14 +37,14 @@ $dial_number	= get_post( "dial_number", $dial_number ) ;
 
 // call the template
 require_once('vp_template.php');
-		
+
 function get_post( $string, $variable ) {
 	if (isset($_GET[$string])) {
 		$variable = $_GET[$string];
 	} elseif (isset($_POST[$string])) {
 		$variable = $_POST[$string];
 	}
-		
+
 	return $variable;
 }
 ?>
