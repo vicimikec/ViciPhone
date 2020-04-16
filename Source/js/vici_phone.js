@@ -492,7 +492,6 @@ function handleProgress( progress ) {
 
 
 function handleInvite( session ) {
-	my_session = session;
 
 	// check if we are in a call already
 	if ( incall ) {
@@ -507,11 +506,11 @@ function handleInvite( session ) {
 		// we are not so good to process it
 
 		// add session event listeners
-		my_session.on('accepted', function() { handleAccepted() } );
-		my_session.on('bye', function( request ) { handleBye( request ) } );
-		my_session.on('failed', function( response, cause ) { handleFailed( response, cause ) } );
-		my_session.on('refer', function() { handleInboundRefer() } );
-		my_session.on('trackAdded', function() { handleTrackAdded( my_session ) } );
+		session.on('accepted', function() { handleAccepted() } );
+		session.on('bye', function( request ) { handleBye( request ) } );
+		session.on('failed', function( response, cause ) { handleFailed( response, cause ) } );
+		session.on('refer', function() { handleInboundRefer() } );
+		session.on('trackAdded', function() { handleTrackAdded( my_session ) } );
 
 		var remoteUri = session.remoteIdentity.uri.toString();
 		var displayName = session.remoteIdentity.displayName;
@@ -540,7 +539,7 @@ function handleInvite( session ) {
 				}
 			};
 
-			my_session.accept(options,modifierArray);
+			session.accept(options,modifierArray);
 			setCallButtonStatus(true);
 		} else {
 			// auto answer not enabled
@@ -760,7 +759,7 @@ function initialize() {
 		setRegisterStatus('register_failed');
 	});
 
-	ua.on('invite', function (session) {
+	ua.on('invite', (session) => {
 		handleInvite( session );
 	});
 
