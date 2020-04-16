@@ -33,6 +33,7 @@ $hide_volume 	= get_post( "hide_volume", $hide_volume ) ;
 $auto_answer	= get_post( "auto_answer", $auto_answer ) ;
 $auto_dial_out	= get_post( "auto_dial_out", $auto_dial_out ) ;
 $dial_number	= get_post( "dial_number", $dial_number ) ;
+$language		= get_post( "language", $language ) ;
 
 
 // call the template
