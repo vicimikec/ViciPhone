@@ -32,18 +32,18 @@
 	<body>
 		<!-- Container -->
 		<div id="container">
-		
+
 			<!-- Main -->
 			<div id="main">
 				<!-- Video element to handle audio -->
 				<audio autoplay width='0' height='0' id="audio"></audio>
-			
+
 				<!-- Logo -->
 				<section id="logo">
 					<img id="logo_img" src="images/wp_logo.png">
 				</section>
 				<!-- End Logo -->
-				
+
 				<!-- Controls -->
 				<section id="controls">
 					<section id="registration_control">
@@ -58,11 +58,11 @@
 					<section id="audio_control">
 						<button class="button" id="mic_mute"><img id="mute_icon" src="images/wp_mic_on.gif" alt="mute"></button>
 						<button class="button" id="vol_up"><img id="vol_up_icon" src="images/wp_speaker_up.gif" alt="register"></button>
-						<button class="button" id="vol_down"><img id="vol_down_icon" src="images/wp_speaker_down.gif" alt="register"></button>						
+						<button class="button" id="vol_down"><img id="vol_down_icon" src="images/wp_speaker_down.gif" alt="register"></button>
 					</section>
 				</section>
 				<!-- End Controls -->
-				
+
 				<!-- Dialpad -->
 				<section id="dialpad">
 					<section id="dial_row1">
@@ -91,10 +91,10 @@
 					</section>
 				</section>
 				<!-- End Dialpad -->
-				
+
 			</div>
 			<!-- End Main -->
-			
+
 		</div>
 		<!-- End Container -->
 
@@ -103,7 +103,7 @@
 
 		<!-- variables to pass vici_phone.js -->
 		<script>
-		
+
 		// SIP configuration variables
 		var cid_name = '<?php echo $cid_name; ?>';
 		var sip_uri = '<?php echo $sip_uri; ?>';
@@ -123,7 +123,7 @@
 		// behavior options
 		var auto_answer = '<?php echo $auto_answer; ?>';
 		var auto_dial_out = '<?php echo $auto_dial_out; ?>';
-		
+
 		// language support
 		var language = '<?php echo $language; ?>';
 		</script>
@@ -133,13 +133,15 @@
 		<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
 		<!-- SIP.js library -->
-		<script src="js/sip.min.js"></script>
+		<script src="js/sip-0.15.10.min.js"></script>
+		<!-- SIP.js library (from CDN, use only one)-->
+		<!--script src="https://cdn.jsdelivr.net/npm/sip.js@0.15.10/dist/sip-0.15.10.min.js"></script-->
 
 		<!-- Translations file -->
 		<script src="js/translations.js"></script>
 
 		<!-- Our Java Script Code -->
 		<script src="js/vici_phone.js"></script>
-		
+
 	</body>
 </html>
