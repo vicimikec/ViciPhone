@@ -132,10 +132,10 @@
 		<!--<script src="js/adapter.js"></script>-->
 		<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
-		<!-- SIP.js library -->
-		<script src="js/sip-0.15.10.min.js"></script>
+		<!-- SIP.js library version 0.13.8-->
+		<script src="js/sip.min.js"></script>
 		<!-- SIP.js library (from CDN, use only one)-->
-		<!--script src="https://cdn.jsdelivr.net/npm/sip.js@0.15.10/dist/sip-0.15.10.min.js"></script-->
+		<!--script src="https://cdn.jsdelivr.net/npm/sip.js@0.13.8/dist/sip-0.13.8.min.js"></script-->
 
 		<!-- Translations file -->
 		<script src="js/translations.js"></script>
