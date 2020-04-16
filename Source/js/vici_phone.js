@@ -4,7 +4,8 @@
 *	JavaScript File for the Vicidial WebRTC Phone
 *
 *	Copyright (C) 2016  Michael Cargile
-*	Version 1.0.0
+*	Updated by Christian Cabrera
+*	Version 2.0.0
 *
 *	This program is free software: you can redistribute it and/or modify
 *	it under the terms of the GNU Affero General Public License as
