@@ -133,7 +133,7 @@
 		<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
 		<!-- SIP.js library, included from CDN. If you need it offline, uncomment the next line -->
-		<script src="https://cdn.jsdelivr.net/npm/sip.js@0.15.10/dist/sip-0.15.10.js"></script-->
+		<script src="https://cdn.jsdelivr.net/npm/sip.js@0.15.10/dist/sip-0.15.10.min.js"></script-->
 
 		<!-- SIP.js library offline version-->
 		<!--script src="js/sip-0.15.10.min.js"></script-->
