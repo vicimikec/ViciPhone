@@ -123,6 +123,7 @@
 		// behavior options
 		var auto_answer = '<?php echo $auto_answer; ?>';
 		var auto_dial_out = '<?php echo $auto_dial_out; ?>';
+		var auto_login = '<?php echo $auto_login; ?>';
 
 		// language support
 		var language = '<?php echo $language; ?>';

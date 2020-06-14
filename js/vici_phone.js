@@ -492,7 +492,7 @@ function handleProgress( progress ) {
 
 
 
-function handleInvite( session ) {
+function handleInvite( my_session ) {
 
 	// check if we are in a call already
 	if ( incall ) {
@@ -507,14 +507,14 @@ function handleInvite( session ) {
 		// we are not so good to process it
 
 		// add session event listeners
-		session.on('accepted', function() { handleAccepted() } );
-		session.on('bye', function( request ) { handleBye( request ) } );
-		session.on('failed', function( response, cause ) { handleFailed( response, cause ) } );
-		session.on('refer', function() { handleInboundRefer() } );
-		session.on('trackAdded', function() { handleTrackAdded( my_session ) } );
+		my_session.on('accepted', function() { handleAccepted() } );
+		my_session.on('bye', function( request ) { handleBye( request ) } );
+		my_session.on('failed', function( response, cause ) { handleFailed( response, cause ) } );
+		my_session.on('refer', function() { handleInboundRefer() } );
+		my_session.on('trackAdded', function() { handleTrackAdded( my_session ) } );
 
-		var remoteUri = session.remoteIdentity.uri.toString();
-		var displayName = session.remoteIdentity.displayName;
+		var remoteUri = my_session.remoteIdentity.uri.toString();
+		var displayName = my_session.remoteIdentity.displayName;
 		var regEx1 = /sip:/;
 		var regEx2 = /@.*$/;
 		var extension = remoteUri.replace( regEx1 , '' );
@@ -540,7 +540,7 @@ function handleInvite( session ) {
 				}
 			};
 
-			session.accept(options,modifierArray);
+			my_session.accept(options,modifierArray);
 			setCallButtonStatus(true);
 		} else {
 			// auto answer not enabled
@@ -746,6 +746,15 @@ function initialize() {
 		if ( (auto_dial_out) && (uiElements.digits.value.length > 0) ) {
 			dialButton();
 		}
+
+		//added By ViciExperts to automatically login agent as soon as the webphone is loaded.
+		if ( auto_login ) {
+			try {
+				parent.NoneInSessionCalL('LOGIN');
+			}
+			catch(err){console.log(err);}
+		}
+
 	});
 
 	ua.on('unregistered', function () {
@@ -761,7 +770,7 @@ function initialize() {
 	});
 
 	ua.on('invite', (session) => {
-		handleInvite( session );
+		handleInvite(session);
 	});
 
 };

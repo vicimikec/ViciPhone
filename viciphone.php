@@ -13,7 +13,7 @@ $hide_volume 	= false;		// Display volume controls
 $hide_mute 		= false;		// Display mute button
 $auto_answer 	= false;		// Auto answer incoming calls
 $auto_dial_out 	= true;			// Auto dial out after loading (only works if a dial_number is specified)
-
+$auto_login		= true;			// Auto login agent as soon as webphone gets loaded
 
 // Enable to enable the debug access log
 $debug_access_log = true;
@@ -159,6 +159,11 @@ if ( in_array( "AUTOANSWER_Y" , $options_array ) ) {
 if ( in_array( "AUTODIAL_Y" , $options_array ) ) {
 	$auto_dial_out = true;
 }
+// whether to enable auto dial out
+if ( in_array( "AUTOLOGIN_N" , $options_array ) ) {
+	$auto_login = false;
+}
+
 
 
 // WEBSOCKET url

@@ -15,6 +15,7 @@ $hide_volume = false;
 $auto_answer= false;
 $dial_number = '';
 $auto_dial_out = false;
+$auto_login = false;
 $debug_enabled = false;
 $language = 'en';
 
@@ -32,6 +33,7 @@ $hide_mute 		= get_post( "hide_mute", $hide_mute ) ;
 $hide_volume 	= get_post( "hide_volume", $hide_volume ) ;
 $auto_answer	= get_post( "auto_answer", $auto_answer ) ;
 $auto_dial_out	= get_post( "auto_dial_out", $auto_dial_out ) ;
+$auto_login		= get_post( "auto_login", $auto_login ) ;
 $dial_number	= get_post( "dial_number", $dial_number ) ;
 $language		= get_post( "language", $language ) ;
 
