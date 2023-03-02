@@ -21,29 +21,30 @@
 *
 *******************************************************************************
 -->
-<html>
+<html manifest="viciphone.appcache">
 	<head>
 		<title>Vicidial Web Phone</title>
 		<link rel="stylesheet" href="<?php echo $layout; ?>" />
-		<meta http-equiv=”Pragma” content=”no-cache”>
-		<meta http-equiv=”Expires” content=”-1″>
-		<meta http-equiv=”CACHE-CONTROL” content=”NO-CACHE”>
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Expires" content="-1">
+		<meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
 	</head>
 	<body>
 		<!-- Container -->
 		<div id="container">
-		
+
 			<!-- Main -->
 			<div id="main">
 				<!-- Video element to handle audio -->
 				<audio autoplay width='0' hieght='0' id="audio"></audio>
-			
+				<!--<video width='0' hieght='0' id="audio"></video>-->
+
 				<!-- Logo -->
 				<section id="logo">
 					<img id="logo_img" src="images/wp_logo.png">
 				</section>
 				<!-- End Logo -->
-				
+
 				<!-- Controls -->
 				<section id="controls">
 					<section id="registration_control">
@@ -58,11 +59,11 @@
 					<section id="audio_control">
 						<button class="button" id="mic_mute"><img id="mute_icon" src="images/wp_mic_on.gif" alt="mute"></button>
 						<button class="button" id="vol_up"><img id="vol_up_icon" src="images/wp_speaker_up.gif" alt="register"></button>
-						<button class="button" id="vol_down"><img id="vol_down_icon" src="images/wp_speaker_down.gif" alt="register"></button>						
+						<button class="button" id="vol_down"><img id="vol_down_icon" src="images/wp_speaker_down.gif" alt="register"></button>
 					</section>
 				</section>
 				<!-- End Controls -->
-				
+
 				<!-- Dialpad -->
 				<section id="dialpad">
 					<section id="dial_row1">
@@ -75,12 +76,12 @@
 					<button class="dialpad_button" id="five">5</button>
 					<button class="dialpad_button" id="six">6</button>
 					</section>
-                                        <section id="dial_row3">
+					<section id="dial_row3">
 					<button class="dialpad_button" id="seven">7</button>
 					<button class="dialpad_button" id="eight">8</button>
 					<button class="dialpad_button" id="nine">9</button>
 					</section>
-                                        <section id="dial_row4">
+					<section id="dial_row4">
 					<button class="dialpad_button" id="star">*</button>
 					<button class="dialpad_button" id="zero">0</button>
 					<button class="dialpad_button" id="pound">#</button>
@@ -91,19 +92,21 @@
 					</section>
 				</section>
 				<!-- End Dialpad -->
-				
+
 			</div>
 			<!-- End Main -->
-			
+
 		</div>
 		<!-- End Container -->
 
 		<!-- Debug Output -->
 		<div id="debug"></div>
 
+		<!-- <?php echo "$options $settings"; ?> -->
+
 		<!-- variables to pass vici_phone.js -->
 		<script>
-		
+
 		// SIP configuration variables
 		var cid_name = '<?php echo $cid_name; ?>';
 		var sip_uri = '<?php echo $sip_uri; ?>';
@@ -120,19 +123,49 @@
 		var hide_mute = '<?php echo $hide_mute; ?>';
 		var hide_volume = '<?php echo $hide_volume; ?>';
 
+		// audio settings
+		var auto_gain = '<?php echo $auto_gain_control; ?>';
+		var echo_can = '<?php echo $echo_cancellation; ?>';
+		var noise_sup = '<?php echo $noise_suppression; ?>';
+
 		// behavior options
-		var auto_answer = '<?php echo $auto_answer; ?>';;
+		var auto_answer = '<?php echo $auto_answer; ?>';
+		var dial_reg_exten = '<?php echo $dial_reg_exten; ?>';
+		var reg_exten = '<?php echo $session_id; ?>';
+		var region = '<?php echo $progress_region; ?>';
+
+		var langAttempting 		= '<?php echo $langAttempting; ?>';
+		var langConnected 		= '<?php echo $langConnected; ?>';
+		var langDisconnected 		= '<?php echo $langDisconnected; ?>';
+		var langExten 			= '<?php echo $langExten; ?>';
+		var langIncall 			= '<?php echo $langIncall; ?>';
+		var langInit 			= '<?php echo $langInit; ?>';
+		var langRedirect 		= '<?php echo $langRedirect; ?>';
+		var langRegFailed 		= '<?php echo $langRegFailed; ?>';
+		var langRegistering 		= '<?php echo $langRegistering; ?>';
+		var langRegistered 		= '<?php echo $langRegistered; ?>';
+		var langReject 			= '<?php echo $langReject; ?>';
+		var langRinging 		= '<?php echo $langRinging; ?>';
+		var langSend 			= '<?php echo $langSend; ?>';
+		var langTrying 			= '<?php echo $langTrying; ?>';
+		var langUnregFailed 		= '<?php echo $langUnregFailed; ?>';
+		var langUnregistered 		= '<?php echo $langUnregistered; ?>';
+		var langUnregistering		= '<?php echo $langUnregistering; ?>';
+		var langWebrtcError 		= '<?php echo $langWebrtcError; ?>';
+
+
 		</script>
 
 		<!-- WebRTC adapter -->
 		<!--<script src="js/adapter.js"></script>-->
-		<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+		<!--<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script> -->
 
 		<!-- SIP.js library -->
-		<script src="js/sip.js"></script>
+		<script  type="text/javascript" src="js/sip.js"></script>
 
 		<!-- Our Java Script Code -->
-		<script src="js/vici_phone.js"></script>
+		<script  type="text/javascript" src="js/vici_phone.js"></script>
 
 	</body>
 </html>
+

@@ -5,38 +5,38 @@ $debug_access_log = true;
 
 // GET / POST Options
 // the phone login used as the auth_user
-if (isset($_GET["phone_login"])) {
-	$phone_login=$_GET["phone_login"];
-} elseif (isset($_POST["phone_login"])) {
+if (isset($_POST["phone_login"])) {
 	$phone_login=$_POST["phone_login"];
+} elseif (isset($_GET["phone_login"])) {
+	$phone_login=$_GET["phone_login"];
 }
 
 // the phone registration password
-if (isset($_GET["phone_pass"])) {
-	$phone_pass=$_GET["phone_pass"];
-} elseif (isset($_POST["phone_pass"])) {
+if (isset($_POST["phone_pass"])) {
 	$phone_pass=$_POST["phone_pass"];
+} elseif (isset($_GET["phone_pass"])) {
+	$phone_pass=$_GET["phone_pass"];
 }
 
 // the server IP to register to
-if (isset($_GET["server_ip"])) {
-	$server_ip=$_GET["server_ip"];
-} elseif (isset($_POST["server_ip"])) {
+if (isset($_POST["server_ip"])) {
 	$server_ip=$_POST["server_ip"];
+} elseif (isset($_GET["server_ip"])) {
+	$server_ip=$_GET["server_ip"];
 }
 
 // the audio codecs to use ( currently not supported )
-if (isset($_GET["codecs"])) {
-	$codecs=$_GET["codecs"];
-} elseif (isset($_POST["codecs"])) {
+if (isset($_POST["codecs"])) {
 	$codecs=$_POST["codecs"];
+} elseif (isset($_GET["codecs"])) {
+	$codecs=$_GET["codecs"];
 }
 
 // additional webphone options
-if (isset($_GET["options"])) {
-	$options=$_GET["options"];
-} elseif (isset($_POST["options"])) { 
+if (isset($_POST["options"])) {
 	$options=$_POST["options"];
+} elseif (isset($_GET["options"])) { 
+	$options=$_GET["options"];
 }
 
 // decode the GET/POST data
@@ -151,21 +151,39 @@ if ( in_array( "AUTOANSWER_Y" , $options_array ) ) {
 
 // WEBSOCKET url
 $ws_server = '';
+
+// Layout file handling
+$layout = '';
+
+// general settings
+$settings = '';
+
+// session id
+$session_id = '';
+
 foreach( $options_array as $value ) {
 	if ( strpos( $value, 'WEBSOCKETURL' ) !== false ) {
 		$ws_server = $value;
 		$ws_server = str_replace( 'WEBSOCKETURL', '', $ws_server );
 	}
-}
 
-// Layout file handling
-$layout = '';
-foreach( $options_array as $value ) {
-        if ( strpos( $value, 'WEBPHONELAYOUT' ) !== false ) {
+	if ( strpos( $value, 'WEBPHONELAYOUT' ) !== false ) {
                 $layout = $value;
                 $layout = str_replace( 'WEBPHONELAYOUT', '', $layout );
+	}
+
+	if ( strpos( $value, 'SETTINGS' ) !== false ) {
+                $settings = $value;
+                $settings = str_replace( 'SETTINGS', '', $settings );
+	}
+
+	if ( strpos( $value, 'SESSION' ) !== false ) {
+                $session_id = $value;
+                $session_id = str_replace( 'SESSION', '', $session_id );
         }
 }
+
+
 if ( $layout == '' ) {
 	# layout is blank use the default
 	$layout = 'css/default.css';
@@ -189,6 +207,40 @@ if ( $layout == '' ) {
 }
 # sanitize the layout to try to prevent XSS
 $layout = filter_var($layout, FILTER_SANITIZE_URL );
+
+# build the settings array
+$settings_array = explode('\n',$settings);
+foreach( $settings_array as $line ) {
+	$key = strstr( $line, ":", true );
+	$value = strstr( $line, ":" );
+	$value = preg_replace( '/:/', '', $value );
+	$value = preg_replace( '/"/', '', $value );
+
+	if ( $key == 'autoGain' ) { $auto_gain_control = $value; }
+	if ( $key == 'echoCan' ) { $echo_cancellation = $value; }
+	if ( $key == 'noiseSup' ) { $noise_suppression = $value; }
+	if ( $key == 'dialRegExten' ) { $dial_reg_exten = $value; }
+	if ( $key == 'progReg' ) { $progress_region = $value; }
+	if ( $key == 'langAttempting' ) { $langAttempting = $value; }
+	if ( $key == 'langConnected' ) { $langConnected = $value; }
+	if ( $key == 'langDisconnected' ) { $langDisconnected = $value; }
+	if ( $key == 'langExten' ) { $langExten = $value; }
+	if ( $key == 'langIncall' ) { $langIncall = $value; }
+	if ( $key == 'langInit' ) { $langInit = $value; }
+	if ( $key == 'langRedirect' ) { $langRedirect = $value; }
+	if ( $key == 'langRegFailed' ) { $langRegFailed = $value; }
+	if ( $key == 'langRegistering' ) { $langRegistering = $value; }
+	if ( $key == 'langRegistered' ) { $langRegistered = $value; }
+	if ( $key == 'langReject' ) { $langReject = $value; }
+	if ( $key == 'langRinging' ) { $langRinging = $value; }
+	if ( $key == 'langSend' ) { $langSend = $value; }
+	if ( $key == 'langTrying' ) { $langTrying = $value; }
+	if ( $key == 'langUnregFailed' ) { $langUnregFailed = $value; }
+	if ( $key == 'langUnregistered' ) { $langUnregistered = $value; }
+	if ( $key == 'langUnregistering' ) { $langUnregistering = $value; }
+	if ( $key == 'langWebrtcError' ) { $langWebrtcError = $value; }
+}
+
 
 // call the template
 require_once('vp_template.php');
